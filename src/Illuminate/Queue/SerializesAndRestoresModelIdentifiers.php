@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -29,6 +30,10 @@ trait SerializesAndRestoresModelIdentifiers
         }
 
         if ($value instanceof QueueableEntity) {
+            if ($value instanceof Model && !$value->exists) {
+                return $value;
+            }
+
             return new ModelIdentifier(
                 get_class($value),
                 $value->getQueueableId(),
